@@ -1,0 +1,284 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+
+namespace analoge
+{
+    public partial class Form_plati : Form
+    {
+        public Form_plati()
+        {
+            InitializeComponent();
+
+            
+
+            //Выбор варианта банка плательщика
+            List<string> states = new List<string>
+             {  "ПАО «Лучший банк»", "ПАО «Главный банк»", "ПАО «Замечательный банк»"};
+         
+
+       
+             // добавляем список элементов
+             domainUpDown1.Items.AddRange(states);            
+            domainUpDown1.TextChanged += domainUpDown2_SelectedItemChanged;
+            // domainUpDown1.TextChanged += domainUpDown2_SelectedItemChanged;
+
+            //Выбор варианта банка получателя
+            List<string> states2 = new List<string>
+             {  "ПАО «Лучший банк»", "ПАО «Главный банк»", "ПАО «Замечательный банк»" };
+
+
+
+            // добавляем список элементов
+            domainUpDown2.Items.AddRange(states2);
+            domainUpDown2.TextChanged += domainUpDown2_SelectedItemChanged;
+            domainUpDown2.Items.RemoveAt(0);
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // Обработчик события клика по кнопке отправки
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var confirmResult = MessageBox.Show("Вы уверены, что хотите отправить?",
+                                         "Подтверждение отправки",
+                                         MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes)
+            {
+                //=========================================
+                // Получаем текущий номер запуска программы
+                int count = GetCount();
+
+                // Выводим номер запуска программы в textBox1
+                textBox1.Text = "№" + count;
+
+                // Увеличиваем номер запуска на 1 и обновляем счетчик
+                UpdateCount(count + 1);
+                //==========================================
+
+
+                ////////textBox1.Text = new Random().Next(0, 100).ToString();
+
+                // Если 'Да', сделайте все поля недоступными для изменения.
+                textBox1.Enabled = false;
+                textBox2.Enabled = false;
+                textBox3.Enabled = false;
+                textBox4.Enabled = false;
+                textBox5.Enabled = false;
+                textBox6.Enabled = false;
+                domainUpDown1.Enabled = false;
+                domainUpDown2.Enabled = false;
+                dateTimePicker1.Enabled = false;
+                MessageBox.Show("Ваше платежное поручение принято к исполнению.",
+                                                                             "Уведомление");
+            }
+            else
+            {
+                // Если 'Нет', выполните действие здесь.
+            }
+        }
+
+        //==========
+        private int GetCount()
+        {
+            int count = 0;
+
+            try
+            {
+                // Пытаемся прочитать значение счетчика из файла "count.txt"
+                string countStr = File.ReadAllText("count.txt");
+                count = int.Parse(countStr);
+            }
+            catch (FileNotFoundException)
+            {
+                // Если файл "count.txt" не существует, считаем, что это первый запуск программы
+                count = 1;
+            }
+            catch (FormatException)
+            {
+                // Выводим сообщение об ошибке чтения файла счетчика, если он содержит неправильное значение
+                textBox1.Text = "Ошибка чтения файла счетчика. Возможно, файл содержит неправильное значение счетчика.";
+            }
+            catch (Exception ex)
+            {
+                // Выводим сообщение об ошибке чтения файла счетчика
+                textBox1.Text = "Ошибка чтения файла счетчика: " + ex.Message;
+            }
+
+            return count;
+        }
+
+        private void UpdateCount(int count)
+        {
+            try
+            {
+                // Записываем новое значение счетчика в файл "count.txt"
+                File.WriteAllText("count.txt", count.ToString());
+            }
+            catch (Exception ex)
+            {
+                // Выводим сообщение об ошибке записи файла счетчика
+                textBox1.Text = "Ошибка записи файла счетчика: " + ex.Message;
+            }
+        }
+        //=============
+
+        // Обработчик события клика по кнопке отмены
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var confirmResult = MessageBox.Show("Вы уверены, что хотите отменить?",
+                                           "Подтверждение отмены",
+                                           MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes)
+            {
+                // Если 'Да', очистите все поля.
+                ClearTextBoxes(this);
+                textBox1.Enabled = true;
+                textBox2.Enabled = true;
+                textBox3.Enabled = true;
+                textBox4.Enabled = true;
+                textBox5.Enabled = true;
+                textBox6.Enabled = true;
+                domainUpDown1.Enabled = true;
+                domainUpDown2.Enabled = true;
+                dateTimePicker1.Enabled = true;
+                //класс статический меиод и гет
+            }
+            else
+            {
+                // Если 'Нет', выполните действие здесь.
+            }
+
+
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+        // Функция для очистки текстовых полей
+        private void ClearTextBoxes(Control parent)
+        {
+            foreach (Control c in parent.Controls)
+            {
+                // Проверяем, является ли элемент управления TextBox
+                if (c.GetType() == typeof(TextBox))
+                {
+                    // Очищаем поле
+                    ((TextBox)(c)).Text = string.Empty;
+                }
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            textBox4.KeyPress += textBox4_KeyPress;
+            textBox4.MaxLength = 9;
+            
+        }
+
+        private void textBox4_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void textBox6_TextChanged(object sender, EventArgs e)
+        {
+            textBox6.KeyPress += textBox6_KeyPress;
+            textBox6.MaxLength = 20;
+        }
+
+        private void textBox6_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void domainUpDown2_SelectedItemChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void domainUpDown1_SelectedItemChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            textBox5.KeyPress += textBox5_KeyPress;
+            textBox5.MaxLength = 12;
+        }
+        private void textBox5_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            // Привязываем обработчик события KeyPress к textBox3
+            textBox3.KeyPress += textBox3_KeyPress;
+
+            // Производим обработку текста только если он не пустой или не состоит из пробелов
+            if (!string.IsNullOrWhiteSpace(textBox3.Text))
+            {
+                // Пытаемся преобразовать текст в тип decimal
+                if (decimal.TryParse(textBox3.Text, out decimal amount))
+                {
+                    // Обновляем текст textBox3 в формате денежной строки
+                    textBox3.Text = amount.ToString("C");
+                }
+            }
+        }
+
+        private void textBox3_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Проверяем, что вводимый символ не является управляющим символом, не цифрой и не символом точки
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '.')
+            {
+                // Отменяем ввод символа, если он не соответствует разрешенным
+                e.Handled = true;
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+    }
+}
